@@ -1,3 +1,4 @@
+// 信号機（赤・青・黄）のような役割
 export const REQUEST_STATE = {
   INITIAL: 'INITIAL',
   LOADING: 'LOADING',
