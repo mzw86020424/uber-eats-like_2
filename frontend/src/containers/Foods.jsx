@@ -55,6 +55,11 @@ const ItemWrapper = styled.div`
   margin: 16px;
 `;
 
+const submitOrder = () => {
+  //後ほど仮注文のAPIを実装
+  console.log('登録ボタンが押された')
+}
+
 export const Foods = ({ match }) => { // match: react-router使用時に使うprops
   const [foodsState, dispatch] = useReducer(foodsReducer, foodsInitialState);
   
@@ -127,9 +132,21 @@ export const Foods = ({ match }) => { // match: react-router使用時に使うpr
         <FoodOrderDialog
           food={state.selectedFood}
           isOpen={state.isOpenOrderDialog}
+          countNumber={state.selectedFoodCount}
+          onClickCountUp={() => setState({
+            ...state,
+            selectedFoodCount: state.selectedFoodCount + 1,
+          })}
+          onClickCountDown={() => setState({
+            ...state,
+            selectedFoodCount: state.selectedFoodCount - 1,
+          })}
+          OnClickOrder={()=>submitOrder()}
           onClose={() => setState({
             ...state,
             isOpenOrderDialog: false,
+            selectedFood: null,
+            selectedFoodCount: 1,
           })}
         />
       }
