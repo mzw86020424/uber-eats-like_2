@@ -1,22 +1,24 @@
 import React, { Fragment, useReducer, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 // components
 import { LocalMallIcon } from '../components/Icons';
 import { FoodWrapper } from '../components/FoodWrapper';
+import { NewOrderConfirmDialog } from '../components/NewOrderConfirmDialog';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { FoodOrderDialog } from '../components/FoodOrderDialog';
 
 // reducers
 import {
-  foodsReducer,
-  foodsActionTypes,
   initialState as foodsInitialState,
+  foodsActionTypes,
+  foodsReducer,
 } from '../reducers/foods';
 
 // apis
 import { fetchFoods } from '../apis/foods';
+import { postLineFoods, replaceLineFoods } from '../apis/line_foods';
 
 // images
 import MainLogo from '../images/logo.png';
@@ -24,7 +26,7 @@ import FoodImage from '../images/food-image.jpg'
 
 // constants
 import { COLORS } from '../style_constants';
-import { REQUEST_STATE } from '../constants';
+import { REQUEST_STATE, HTTP_STATUS_CODE } from '../constants';
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -55,20 +57,19 @@ const ItemWrapper = styled.div`
   margin: 16px;
 `;
 
-const submitOrder = () => {
-  //後ほど仮注文のAPIを実装
-  console.log('登録ボタンが押された')
-}
-
 export const Foods = ({ match }) => { // match: react-router使用時に使うprops
-  const [foodsState, dispatch] = useReducer(foodsReducer, foodsInitialState);
   
   const initialState = {
     isOpenOrderDialog: false,
     selectedFood: null,
     selectedFoodCount: 1,
-  }
+    isOpenNewOrderDialog: false,
+    existingRestaurantName: '',
+    newRestaurantName: '',
+  };
   const [state, setState] = useState(initialState);
+  const [foodsState, dispatch] = useReducer(foodsReducer, foodsInitialState);
+  const history = useHistory();
 
   useEffect(() => {
     dispatch({ type: foodsActionTypes.FETCHING });
@@ -81,7 +82,34 @@ export const Foods = ({ match }) => { // match: react-router使用時に使うpr
           }
         });
       })
-  }, [])
+  }, []);
+
+  const submitOrder = () => {
+    postLineFoods({
+      foodId: state.selectedFood.id,
+      count: state.selectedFoodCount,
+    }).then(() => history.push('/orders')) // history -> React Routerのカスタムフック。関数の結果でページ遷移
+      .catch((e) => {
+        if (e.response.status === HTTP_STATUS_CODE.NOT_ACCEPTABLE) {
+          setState({
+            ...state,
+            isOpenOrderDialog: false,
+            isOpenNewOrderDialog: true,
+            existingRestaurantName: e.response.data.existing_restaurant,
+            newRestaurantName: e.response.data.new_restaurant,
+          })
+        } else {
+          throw e;
+        }
+      })
+  };
+
+  const replaceOrder = () => {
+    replaceLineFoods({
+      foodId: state.selectedFood.id,
+      count: state.selectedFoodCount,
+    }).then(() => history.push('/orders'))
+  }
 
   return (
     <Fragment>
@@ -95,7 +123,6 @@ export const Foods = ({ match }) => { // match: react-router使用時に使うpr
           </Link>
         </BagIconWrapper>
       </HeaderWrapper>
-
       <FoodsList>
         {
           foodsState.fetchState === REQUEST_STATE.LOADING ?
@@ -105,8 +132,7 @@ export const Foods = ({ match }) => { // match: react-router使用時に使うpr
                   <ItemWrapper key={i}>
                     <Skeleton key={i} variant="rect" width={450} height={180} />
                   </ItemWrapper>
-                )
-                
+                )     
               }
             </Fragment>
             :
@@ -117,8 +143,8 @@ export const Foods = ({ match }) => { // match: react-router使用時に使うpr
                   onClickFoodWrapper={ // foodWrapperがクリックされるとこのsetStateが実行され、ここのstateが変更される
                     (food) => setState({
                       ...state,
-                      isOpenOrderDialog: true,
                       selectedFood: food,
+                      isOpenOrderDialog: true,
                     })
                   }
                   imageUrl={FoodImage}
@@ -130,8 +156,8 @@ export const Foods = ({ match }) => { // match: react-router使用時に使うpr
       {
         state.isOpenOrderDialog &&
         <FoodOrderDialog
-          food={state.selectedFood}
           isOpen={state.isOpenOrderDialog}
+          food={state.selectedFood}
           countNumber={state.selectedFoodCount}
           onClickCountUp={() => setState({
             ...state,
@@ -141,13 +167,23 @@ export const Foods = ({ match }) => { // match: react-router使用時に使うpr
             ...state,
             selectedFoodCount: state.selectedFoodCount - 1,
           })}
-          OnClickOrder={()=>submitOrder()}
+          onClickOrder={() => submitOrder()}
           onClose={() => setState({
             ...state,
             isOpenOrderDialog: false,
             selectedFood: null,
             selectedFoodCount: 1,
           })}
+        />
+      }
+      {
+        state.isOpenNewOrderDialog &&
+        <NewOrderConfirmDialog
+          isOpen={state.isOpenNewOrderDialog}
+          onClose={() => setState({ ...state, isOpenNewOrderDialog: false })}
+          existingRestaurantName={state.existingRestaurantName}
+          newRestaurantName={state.newRestaurantName}
+          onClickSubmit={() => replaceOrder()}
         />
       }
     </Fragment>
