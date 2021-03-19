@@ -59,15 +59,13 @@ module Api
       end
 
       def set_line_food(ordered_food)
-        # Railsガイド belongs_to関連付けの詳細 https://railsguides.jp/association_basics.html#belongs-to%E3%81%A7%E8%BF%BD%E5%8A%A0%E3%81%95%E3%82%8C%E3%82%8B%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89
-        # 同じfoodに紐づいているline_foodがあるかどうか
-        if ordered_food.line_food.present? # すでに存在するline_foodに足す
+        if ordered_food.line_food.present?
           @line_food = ordered_food.line_food
           @line_food.attributes = {
             count: ordered_food.line_food.count + params[:count],
             active: true
           }
-        else # 新しいline_foodのインスタンスを作る
+        else
           @line_food = ordered_food.build_line_food(
             count: params[:count],
             restaurant: ordered_food.restaurant,

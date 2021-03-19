@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
 // components
-import Skelton from '@material-ui/lab/Skeleton';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 // apis
 import { fetchRestaurants } from '../apis/restaurants';
@@ -96,9 +96,9 @@ export const Restaurants = () => {
         {
           state.fetchState === REQUEST_STATE.LOADING ?
             <Fragment>
-              <Skelton variant="rect" width={450} height={300} />
-              <Skelton variant="rect" width={450} height={300} />
-              <Skelton variant="rect" width={450} height={300} />
+              <Skeleton variant="rect" width={450} height={300} />
+              <Skeleton variant="rect" width={450} height={300} />
+              <Skeleton variant="rect" width={450} height={300} />
             </Fragment>
             :
             state.restaurantsList.map((item, index) =>

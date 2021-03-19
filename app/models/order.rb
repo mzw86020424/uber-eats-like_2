@@ -1,7 +1,8 @@
 class Order < ApplicationRecord
   has_many :line_foods
-  
-  validates :total_price, numericality: { greater_than: 0 }
+  has_one :restaurant, through: :line_food
+
+  validates :total_price, numericality: { greater_than:0 }
 
   def save_with_update_line_foods!(line_foods)
     ActiveRecord::Base.transaction do

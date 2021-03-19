@@ -2,8 +2,8 @@ import { REQUEST_STATE } from '../constants';
 
 export const initialState = {
   fetchState: REQUEST_STATE.INITIAL, // 取得状況
-  postState: REQUEST_STATE.INITIAL, // 登録状況
-  lineFoodsSummary: null, // 仮注文データ
+  postState: REQUEST_STATE.INITIAL,  // 登録状況
+  lineFoodsSummary: null,            // 仮注文データ
 };
 
 export const lineFoodsActionTypes = {

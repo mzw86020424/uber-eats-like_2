@@ -22,11 +22,12 @@ import { postLineFoods, replaceLineFoods } from '../apis/line_foods';
 
 // images
 import MainLogo from '../images/logo.png';
-import FoodImage from '../images/food-image.jpg'
+import FoodImage from '../images/food-image.jpg';
 
 // constants
+import { HTTP_STATUS_CODE } from '../constants';
 import { COLORS } from '../style_constants';
-import { REQUEST_STATE, HTTP_STATUS_CODE } from '../constants';
+import { REQUEST_STATE } from '../constants';
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -57,7 +58,9 @@ const ItemWrapper = styled.div`
   margin: 16px;
 `;
 
-export const Foods = ({ match }) => { // match: react-router使用時に使うprops
+export const Foods = ({
+  match
+}) => { // match: react-router使用時に使うprops
   
   const initialState = {
     isOpenOrderDialog: false,

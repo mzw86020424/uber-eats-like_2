@@ -21,7 +21,7 @@ export const foodsReducer = (state, action) => { // action -> foodsのコンポ�
       return {
         fetchState: REQUEST_STATE.OK,
         foodsList: action.payload.foods,
-      }
+      };
     default:
       throw new Error();
   }

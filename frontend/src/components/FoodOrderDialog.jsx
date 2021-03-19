@@ -54,12 +54,12 @@ const PriceWrapper = styled.div`
 
 export const FoodOrderDialog = ({
   food,
+  countNumber,
   isOpen,
   onClose,
   onClickCountUp,
   onClickCountDown,
   onClickOrder,
-  countNumber,
 }) => {
   return (
     <Dialog
@@ -101,7 +101,7 @@ export const FoodOrderDialog = ({
               {`${countNumber}点を注文に追加`}
             </OrderButtonTextWrapper>
             <PriceWrapper>
-              {`¥${countNumber*food.price}`}
+              {`¥${countNumber * food.price}`}
             </PriceWrapper>
           </OrderTextWrapper>
         </OrderButton>
